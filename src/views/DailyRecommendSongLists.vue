@@ -100,7 +100,8 @@
       </div>
     </van-sticky>
 
-    <ul class="listsData">
+    <van-loading v-if="!dailyRecommendSongList"/>
+    <ul class="listsData" v-if="dailyRecommendSongList">
       <li
         v-for="(item, index) in dailyRecommendSongList"
         :key="item.id"
@@ -113,7 +114,7 @@
           </h2>
           <p>{{ item.ar[0].name }}</p>
         </div>
-        <div class="icons">
+        <div class="icons" v-show="false">
           <span class="iconfont">
             <svg
               t="1657247613469"
@@ -142,8 +143,11 @@
 <script>
 //这里可以导入其他文件(比如:组件,工具js,第三方插件js,json文件,图片文件等等)
 //例如:import 《组件名称》 from '《组件路径》';
+import Vue from 'vue';
 import bottomnav from "../components/basce/BottomNav.vue";
 import { getdailyRecommendSongList } from "../api/dailyrecommendsonglist";
+import { Loading } from 'vant';
+Vue.use(Loading)
 export default {
   //import引入的组件需要注入到对象中才能使用
   components: { bottomnav },

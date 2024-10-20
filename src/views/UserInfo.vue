@@ -1,6 +1,5 @@
 <!-- 个人中心 -->
 <template>
-
   <div class="userInfo">
     <!-- 顶部按钮 -->
     <div class="top">
@@ -41,6 +40,7 @@
       </router-link>
     </div>
     <!-- 用户信息 -->
+    <van-loading v-if="!UserDetail" />
     <div class="user" v-if="UserDetail">
       <div class="profilePicture">
         <img :src="UserDetail.profile.avatarUrl" alt="" />
@@ -62,7 +62,7 @@
       </div>
     </div>
     <!-- 八个按钮 -->
-    <div class="buttons">
+    <div class="buttons" @click="unFinish">
       <ul>
         <li>
           <div class="recentlyPlayed">
@@ -273,6 +273,7 @@
       </div>
     </div>
     <!-- 我喜欢的音乐 -->
+    <!-- <van-loading v-if="!userPlaylist"> -->
     <div class="myMusic" v-if="userPlaylist">
       <router-link
         tag="div"
@@ -314,6 +315,7 @@
       </div>
     </div>
     <!-- 歌单 -->
+    <van-loading v-if="!userPlaylist"/>
     <div class="mySongList" v-if="userPlaylist">
       <van-tabs v-model="active" background="transparent">
         <van-tab title="创建歌单">
@@ -321,6 +323,7 @@
           <div class="createSongList">
             <!-- 顶部信息 -->
             <div class="tops">
+              <van-loading v-if="!userSubcount"/>
               <div class="leftTop" v-if="userSubcount">
                 创建歌单({{ userSubcount.artistCount }})个
               </div>
@@ -364,6 +367,7 @@
               </div>
             </div>
             <!-- 列表 -->
+            <van-loading v-if="!userPlaylist.playlist" />
             <div class="myCreateList" v-if="userPlaylist.playlist">
               <ul>
                 <li v-for="(item, index) in userPlaylist.playlist" :key="index">
@@ -415,6 +419,7 @@
                       <div
                         class="myCreateListLeftInfo"
                         style="line-height: 40px"
+                        @click="unFinish"
                       >
                         一键导入外部歌单
                       </div>
@@ -426,9 +431,11 @@
             </div>
           </div>
           <!-- 收藏歌单 -->
+          <van-loading v-if="!userPlaylist.playlist" />
           <div class="createSongList" v-if="userPlaylist.playlist">
             <!-- 顶部信息 -->
             <div class="tops">
+              <van-loading v-if="!userSubcount" />
               <div class="leftTop" v-if="userSubcount">
                 收藏歌单({{ userSubcount.subPlaylistCount }})个
               </div>
@@ -455,6 +462,7 @@
               </div>
             </div>
             <!-- 列表 -->
+            <van-loading v-if="!userPlaylist.playlist" />
             <div class="myCreateList" v-if="userPlaylist.playlist">
               <ul>
                 <li v-for="(item, index) in userPlaylist.playlist" :key="index">
@@ -506,8 +514,13 @@
         </van-tab>
       </van-tabs>
     </div>
-    <button @click="logoutFun">点击退出登陆</button>
-    <bottomnav></bottomnav>   
+    <button
+      style="margin-bottom: 130px; border-radius: 12px; font-size: 15px"
+      @click="logoutFun"
+    >
+      点击退出登陆
+    </button>
+    <bottomnav></bottomnav>
   </div>
 </template>
 
@@ -515,13 +528,14 @@
 //这里可以导入其他文件(比如:组件,工具js,第三方插件js,json文件,图片文件等等)
 //例如:import 《组件名称》 from '《组件路径》';
 import { getLoginstutas, logout } from "../api/login";
-import bottomnav from '../components/basce/BottomNav.vue'
+import bottomnav from "../components/basce/BottomNav.vue";
 import {
   getUserInfo,
   getUserDetail,
   getUserPlaylist,
   getUserSubcount,
 } from "@/api/userinfo";
+import { Toast, Dialog } from "vant";
 export default {
   //import引入的组件需要注入到对象中才能使用
   components: {
@@ -556,10 +570,16 @@ export default {
     },
     /* 退出登陆方法 */
     logoutFun() {
-      logout();
-      console.log("退出登陆,", this.loginStutas);
-      window.localStorage.removeItem("token");
-      /* this.$router.push('/home') */
+      Dialog.confirm({
+        title: "确认退出登录?",
+        message: "您确定要退出登录吗?",
+      }).then(() => {
+        logout();
+        console.log("退出登陆,", this.loginStutas);
+        window.localStorage.removeItem("token");
+        Toast("退出登录成功!");
+        this.$router.push("/home");
+      });
     },
     /* 获取用户信息方法 */
     getUserInfoFun() {
@@ -595,6 +615,10 @@ export default {
         console.log("用户歌单数量", this.userSubcount);
       });
     },
+    /* 未完成提示 */
+    unFinish() {
+      Toast("该功能维护中，请稍后再试~");
+    },
   },
   //生命周期 - 创建完成(可以访问当前this实例)
   created() {
@@ -617,6 +641,7 @@ export default {
   min-width: 375px;
   margin: 0 auto;
   background-color: rgb(242, 241, 240);
+
   /* 顶部 */
   .top {
     width: 100%;
@@ -807,9 +832,9 @@ export default {
 }
 /* 歌单 */
 .mySongList {
+  margin-bottom: 20px;
   .van-tabs {
     width: 93%;
-    
     margin: 0 auto;
     background-color: transparent;
     .createSongList {

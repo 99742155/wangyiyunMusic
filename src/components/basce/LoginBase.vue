@@ -60,7 +60,9 @@
       </div>
     </div>
     <div class="phoneIn" v-show="showPhoneNext">
-      <div class="top"><span @click="goback">←</span><span> 手机号登陆</span></div>
+      <div class="top">
+        <span @click="goback">←</span><span> 手机号登陆</span>
+      </div>
       <div class="text">
         <div class="text1">登陆体验更多精彩</div>
         <div class="text2">未注册手机号登录后将自动创建账号</div>
@@ -73,11 +75,13 @@
     </div>
 
     <div class="code" v-show="showCodeNext">
-      <div class="top"><span @click="goback">←</span><span> 手机号登陆</span></div>
+      <div class="top">
+        <span @click="goback">←</span><span> 手机号登陆</span>
+      </div>
       <div class="text">
         <div class="text1">请输入验证码</div>
         <div class="text2">已发送至+86 {{ this.phone }}</div>
-        <input type="password" placeholder="请输入密码" v-model="password" />
+       <!--  <input type="password" placeholder="请输入密码" v-model="password" /> -->
         <input type="text" placeholder="请输入验证码" v-model="code" />
         <div class="getCode" @click="submit">登陆</div>
       </div>
@@ -118,13 +122,18 @@
 
 <script>
 import { Toast } from "vant";
-import { getCaptcha, getLoginCellphone } from "../../api/login";
+import {
+  getCaptcha,
+  getLoginCellphone,
+  getCaptchaVerify,
+} from "../../api/login";
 export default {
   data() {
     return {
       code: "",
       phone: "",
       password: "",
+      captcha: "",
       showPhoneLogin: true,
       showPhoneNext: false,
       showCodeNext: false,
@@ -158,22 +167,33 @@ export default {
     // 提交数据
     submit() {
       // 1.验证验证码
-      // 请求用户名密码登录方法
-      getLoginCellphone({
+      getCaptchaVerify({
         phone: this.phone,
-        password: this.password,
+        captcha: this.code,
       }).then((data) => {
-        console.log(data);
         if (data.code == 200) {
-          this.$toast({ message: "登录成功", position: "bottom" });
-          localStorage.setItem("token", data.token); //登录成功添加token
-          this.$router.push("/home");
-        } else {
-          this.$toast({ message: "登录失败,请检查账号密码或验证码", position: "bottom" });
+          // 请求用户名密码登录方法
+          getLoginCellphone({
+            phone: this.phone,
+            captcha: this.code,
+          }).then((data) => {
+            console.log(data);
+            if (data.code == 200) {
+              this.$toast({ message: "登录成功", position: "bottom" });
+              localStorage.setItem("token", data.token); //登录成功添加token
+              this.$router.push("/home");
+            } else {
+              this.$toast({
+                message: "登录失败,请重试",
+                position: "bottom",
+              });
+            }
+          });
+        }
+        else{
+          Toast('验证码错误，请重试!')
         }
       });
-      //     }
-      // })
     } /* 显示手机登陆方法 */,
     showPhoneLoginFun() {
       if (this.checked == false) {
@@ -206,10 +226,10 @@ export default {
       this.$emit("lent-player-show", true);
     },
     /* 返回上一页方法 */
-    goback(){
+    goback() {
       console.log(11);
-      this.$router.go(-1)
-    }
+      this.$router.go(-1);
+    },
   },
   //生命周期 - 创建完成(可以访问当前this实例)
   created() {

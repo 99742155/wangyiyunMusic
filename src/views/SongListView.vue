@@ -1,5 +1,5 @@
 <template>
-  <div class="songLists" v-if="playlist">
+  <div class="songLists">
     <div class="tapNav">
       <router-link tag="div" to="/home" class="title">
         <!-- 返回 -->
@@ -62,7 +62,8 @@
         </span>
       </div>
     </div>
-    <div class="infos">
+    <van-loading v-if="!playlist" />
+    <div class="infos" v-if="playlist">
       <div
         class="bg"
         :style="{
@@ -190,7 +191,7 @@
         </div>
       </div>
     </div>
-    <van-sticky :offset-top="40">
+    <van-sticky :offset-top="40" v-if="playlist">
       <div class="playerAll">
         <div class="btn">
           <span class="iconfont">
@@ -216,7 +217,9 @@
         <p>({{ playlist.tracks.length }})</p>
       </div>
     </van-sticky>
-    <ul class="listsData">
+
+    <van-loading v-if="!playlist" style="margin-top:20px" />
+    <ul class="listsData" v-if="playlist">
       <li
         v-for="(item, index) in playlist.tracks"
         :key="item.id"
@@ -274,8 +277,11 @@
 </template>
 
 <script>
+import Vue from "vue";
 import { getPlaylistDetail } from "../api/song";
 import bottomnav from "../components/basce/BottomNav.vue";
+import { Loading } from "vant";
+Vue.use(Loading);
 export default {
   data() {
     return {

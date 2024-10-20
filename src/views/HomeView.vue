@@ -103,7 +103,7 @@
           </div>
         </router-link>
 
-        <li>
+        <li @click="unFinish">
           <div class="svg">
             <svg
               t="1656904557227"
@@ -130,7 +130,7 @@
           </div>
         </li>
 
-        <router-link tag="li" to="/songlistsquare">
+        <li @click="unFinish">
           <div class="svg">
             <svg
               t="1656904971575"
@@ -165,9 +165,9 @@
             </svg>
             <p>歌单</p>
           </div>
-        </router-link>
+        </li>
 
-        <li>
+        <li @click="unFinish">
           <div class="svg">
             <svg
               t="1656905116964"
@@ -189,7 +189,7 @@
           </div>
         </li>
 
-        <li>
+        <li @click="unFinish">
           <div class="svg">
             <svg
               t="1656905209623"
@@ -226,7 +226,7 @@
           </div>
         </li>
 
-        <li>
+        <li @click="unFinish">
           <div class="svg">
             <svg
               t="1656905260165"
@@ -248,7 +248,7 @@
           </div>
         </li>
 
-        <li>
+        <li @click="unFinish">
           <div class="svg">
             <svg
               t="1656905383047"
@@ -270,7 +270,7 @@
           </div>
         </li>
 
-        <li>
+        <li @click="unFinish">
           <div class="svg">
             <svg
               t="1656919536610"
@@ -297,7 +297,7 @@
           </div>
         </li>
 
-        <li>
+        <li @click="unFinish">
           <div class="svg">
             <svg
               t="1656919596639"
@@ -318,7 +318,7 @@
             <p>歌房</p>
           </div>
         </li>
-        <li>
+        <li @click="unFinish">
           <div class="svg">
             <svg
               t="1656919696377"
@@ -385,7 +385,8 @@
 
         <!-- 每日推荐歌单列表 -->
         <div class="lists">
-          <ul>
+          <van-loading v-if="!creatives" />
+          <ul v-if="creatives">
             <router-link
               tag="li"
               :to="'/songlist?id=' + songlist.creativeId"
@@ -492,7 +493,7 @@
     <div class="IndividualSongLists">
       <div class="songlist">
         <div class="title">
-          <h3>推荐歌单</h3>
+          <h3 v-if="HOMEPAGE_BLOCK_MGC_PLAYLIST.uiElement">{{HOMEPAGE_BLOCK_MGC_PLAYLIST.uiElement.subTitle.title}}</h3>
           <div class="more">
             更多
             <svg
@@ -513,18 +514,19 @@
             </svg>
           </div>
         </div>
-
-        <!-- 每日推荐歌单列表 -->
         <div class="lists">
-          <ul>
+          <ul v-if="HOMEPAGE_BLOCK_MGC_PLAYLIST">
             <router-link
               tag="li"
               :to="'/songlist?id=' + songlist.creativeId"
-              v-for="songlist in creatives"
+              v-for="songlist in HOMEPAGE_BLOCK_MGC_PLAYLIST"
               :key="songlist.creativeId"
             >
-              <div class="img">
-                <img :src="songlist.uiElement.image.imageUrl" alt="" />
+              <div class="img" v-if="songlist && songlist.uiElement && songlist.uiElement.image">
+                <img
+                  :src="songlist.uiElement.image.imageUrl"
+                  alt=""
+                />
                 <div class="playView">
                   <div class="num">
                     <svg
@@ -544,13 +546,13 @@
                       ></path>
                     </svg>
                     {{
-                      songlist.resources[0].resourceExtInfo.playCount
-                        | playCountNum
+                      songlist.resources[0].resourceExtInfo
+                        .playCount | playCountNum
                     }}
                   </div>
                 </div>
               </div>
-              <p>
+              <p v-if="songlist && songlist.uiElement && songlist.uiElement.mainTitle">
                 {{ songlist.uiElement.mainTitle.title }}
               </p>
             </router-link>
@@ -569,10 +571,10 @@
 //这里可以导入其他文件(比如:组件,工具js,第三方插件js,json文件,图片文件等等)
 //例如:import 《组件名称》 from '《组件路径》';
 import Vue from "vue";
-import { Swipe, SwipeItem, CountDown } from "vant";
+import { Swipe, SwipeItem, CountDown, Loading, Toast } from "vant";
 import { getBanner, getHomepage } from "../api/home";
 import bottomnav from "../components/basce/BottomNav.vue";
-Vue.use(Swipe).use(SwipeItem).use(CountDown);
+Vue.use(Swipe).use(SwipeItem).use(CountDown).use(Loading);
 import Swiper from "swiper";
 export default {
   //import引入的组件需要注入到对象中才能使用
@@ -602,31 +604,40 @@ export default {
     /* 获取轮播图数据方法 */
     getBannerFun() {
       getBanner().then((data) => {
+        console.log("轮播图数据==>", data);
         this.banners = data.banners;
       });
     },
     /* 获取页面数据方法 */
     getHomepageFun() {
       getHomepage().then((data) => {
-        console.log(data);
+        console.log("页面数据==>", data);
         let blocks = data.data.blocks;
-        /* let bannersIndex = blocks.findIndex((item) => item.blockCode == "HOMEPAGE_BANNER");
-        this.banners = data.data.blocks[bannersIndex].extInfo.banners; */
-        /*  */
+
+        /* 推荐歌单 */
         let creativesIndex = blocks.findIndex(
           (item) => item.blockCode == "HOMEPAGE_BLOCK_PLAYLIST_RCMD"
         );
         this.creatives = data.data.blocks[creativesIndex].creatives;
-        /*  */
+        console.log("推荐歌单数据==>" + this.creatives);
+
+        /* 猜你喜欢 */
         let BLOCK_STYLE_RCMDIndex = blocks.findIndex(
           (item) => item.blockCode == "HOMEPAGE_BLOCK_STYLE_RCMD"
         );
         this.BLOCK_STYLE_RCMD = data.data.blocks[BLOCK_STYLE_RCMDIndex];
+        console.log("猜你喜欢歌曲数据==>" + this.BLOCK_STYLE_RCMD);
+
         /* 个人雷达歌单 */
-        /* let HOMEPAGE_BLOCK_MGC_PLAYLISTIndex = blocks.findIndex(
+        let HOMEPAGE_BLOCK_MGC_PLAYLISTIndex = blocks.findIndex(
           (item) => item.blockCode == "HOMEPAGE_BLOCK_MGC_PLAYLIST"
         );
-        this.HOMEPAGE_BLOCK_MGC_PLAYLIST = data.data.blocks[HOMEPAGE_BLOCK_MGC_PLAYLISTIndex].creatives; */
+        this.HOMEPAGE_BLOCK_MGC_PLAYLIST =
+          data.data.blocks[HOMEPAGE_BLOCK_MGC_PLAYLISTIndex].creatives;
+        this.HOMEPAGE_BLOCK_MGC_PLAYLIST.uiElement =
+          data.data.blocks[HOMEPAGE_BLOCK_MGC_PLAYLISTIndex].uiElement;
+        console.log("个人雷达歌单数据==>" + this.HOMEPAGE_BLOCK_MGC_PLAYLIST);
+        console.log("个人雷达歌单标题名==>" + this.HOMEPAGE_BLOCK_MGC_PLAYLIST.uiElement);
       });
     },
     /* 获取歌曲id方法 */
@@ -636,6 +647,11 @@ export default {
     /* 获取Mini歌单方法 */
     setMiniListId(item) {
       this.$emit("get-mini-List", item);
+    },
+
+    /* 未完成提示方法 */
+    unFinish() {
+      Toast("该功能维护中，请稍后再试吧~");
     },
   },
   filters: {
@@ -678,16 +694,14 @@ export default {
   padding: 0;
 }
 
-
-
 .home {
   //padding: 0 0.6rem;
+  padding-bottom: 100px;
   margin: 0 auto;
   background-image: linear-gradient(#e8ecec 40%, #ffffff 60%);
   /* 搜索框 */
   .topSearch {
     padding-left: 0.625rem;
-
     padding-top: 0.625rem;
     display: flex;
     justify-content: space-between;
@@ -847,8 +861,8 @@ export default {
       h3 {
         height: 1.9375rem;
         line-height: 1.9375rem;
-        padding-left: 1.25rem;
-        background: url("../assets/img/01.png") no-repeat left center;
+        //padding-left: 1.25rem;
+        //background: url("../assets/img/01.png") no-repeat left center;
         background-size: 1.125rem;
       }
       .more {

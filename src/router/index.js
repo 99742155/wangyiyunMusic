@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import { Toast } from 'vant'
 
 Vue.use(VueRouter)
 
@@ -55,14 +56,14 @@ const routes = [{
     path: "/advertisement",
     name: "advertisement",
     component: () => import("../components/public/AdvertisementCom.vue"),
-    beforeEnter: (to, from, next) => {
+    /* beforeEnter: (to, from, next) => {
       let guidePage = window.localStorage.getItem("guidePage");
       if (guidePage) {
         next();
       } else {
         next("/guidePage");
       }
-    }
+    } */
   },
   /* 登陆页 */
   {
@@ -89,6 +90,7 @@ const routes = [{
         let login = window.localStorage.getItem("token");
         // 判断是否登录
         if (!login) {
+          Toast("请先登录!");
           next("/login");
         } else {
           next();

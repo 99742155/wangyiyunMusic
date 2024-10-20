@@ -9,7 +9,7 @@
 export default {
   data() {
     return {
-      num: 3,
+      num: 5,
       clearNum: null,
     };
   },
@@ -45,9 +45,18 @@ export default {
     /* height: 41.6875rem; */
   }
   .times {
+    width: 100px;
+    height: 25px;
+    font-size: 15px;
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    border-radius: 15px;
     position: absolute;
-    top: 0;
-    right: 0;
+    top: 15px;
+    right: 10px;
   }
 }
 </style>

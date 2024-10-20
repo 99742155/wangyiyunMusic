@@ -13,6 +13,7 @@ export function getCaptcha(params){
 }
 
 
+
 /**
  * 验证验证码
  * @param {Number} phone 手机号码
@@ -30,6 +31,7 @@ export function getCaptcha(params){
  * 手机密码登录
  * @param {Number} phone 手机号码
  * @param {Number} password 密码
+ * @param {Number} captcha 验证码
  */
  export function getLoginCellphone(params){
     return request({
@@ -38,6 +40,9 @@ export function getCaptcha(params){
         params
     })
 }
+
+
+
 /**
  * 登出
  * 
@@ -49,7 +54,11 @@ export function logout(params){
         params
     })
 }
-
+/**
+ * 获取登录状态
+ * @param {*} params 
+ * @returns 
+ */
 export function getLoginstutas(params){
     return request({
         url:"/login/status",
@@ -57,3 +66,4 @@ export function getLoginstutas(params){
         params
     })
 }
+

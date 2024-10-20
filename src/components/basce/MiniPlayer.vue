@@ -588,7 +588,8 @@
           </div>
           <!-- 最新 -->
           <div class="newContent" v-show="newComment">
-            <ul>
+            <van-loading v-if="!songComment.comments" />
+            <ul v-if="songComment.comments">
               <li v-for="(item, index) in songComment.comments" :key="index">
                 <!-- 用户信息 -->
                 <div class="top">
@@ -672,7 +673,8 @@
           </div>
           <!-- 最热 -->
           <div class="hotConent" v-show="!newComment">
-            <ul>
+            <van-loading v-if="!songComment.hotComments" />
+            <ul v-if="songComment.hotComments">
               <li v-for="(item, index) in songComment.hotComments" :key="index">
                 <!-- 用户信息 -->
                 <div class="top">
@@ -939,7 +941,13 @@ import { getdailyRecommendSongList } from "../../api/dailyrecommendsonglist";
 import { getPlaylistDetail } from "../../api/song";
 export default {
   //import引入的组件需要注入到对象中才能使用
-  props: ["playerId", "listId", "miniList","lent-player-close","lent-player-show"],
+  props: [
+    "playerId",
+    "listId",
+    "miniList",
+    "lent-player-close",
+    "lent-player-show",
+  ],
   components: {},
   data() {
     //这里存放数据
@@ -1047,8 +1055,6 @@ export default {
     keywords: function () {
       console.log("评论区输入框", this.keywords);
     },
-    
-    
   },
   //方法集合
   methods: {
@@ -1080,6 +1086,7 @@ export default {
     },
     /* 播放方法 */
     playing() {
+      Toast("歌曲加载中♪...");
       if (this.isplaying) {
         this.$refs.audio.play();
       } else {
@@ -1259,6 +1266,10 @@ export default {
       let login = window.localStorage.getItem("token");
       // 判断是否登录
       if (!login) {
+        Toast("请先登录!");
+        this.showBigPlayer = false;
+        this.ShowCommentView = false;
+        this.showplayer = true;
         this.$router.push("/login");
         this.SongDetail = null;
         return;
@@ -1285,6 +1296,10 @@ export default {
       let login = window.localStorage.getItem("token");
       // 判断是否登录
       if (!login) {
+        Toast("请先登录!");
+        this.showBigPlayer = false;
+        this.ShowCommentView = false;
+        this.showplayer = true;
         this.$router.push("/login");
         this.SongDetail = null;
         return;
@@ -1306,6 +1321,10 @@ export default {
       let login = window.localStorage.getItem("token");
       // 判断是否登录
       if (!login) {
+        Toast("请先登录!");
+        this.showBigPlayer = false;
+        this.ShowCommentView = false;
+        this.showplayer = true;
         this.$router.push("/login");
         this.SongDetail = null;
         return;
@@ -1327,11 +1346,23 @@ export default {
     },
     /* 喜欢歌曲方法 */
     likeThisSongFun() {
-      likeSong({ id: this.playerId }).then((data) => {
-        console.log("点赞", data);
-        this.likeThisSong = true;
-        Toast("喜欢成功");
-      });
+      let login = window.localStorage.getItem("token");
+      // 判断是否登录
+      if (!login) {
+        Toast("请先登录!");
+        this.showBigPlayer = false;
+        this.ShowCommentView = false;
+        this.showplayer = true;
+        this.$router.push("/login");
+        this.SongDetail = null;
+        return;
+      } else {
+        likeSong({ id: this.playerId }).then((data) => {
+          console.log("点赞", data);
+          this.likeThisSong = true;
+          Toast("喜欢成功");
+        });
+      }
     },
     /* 取消喜欢方法 */
     DonlikeThisSongFun() {
@@ -1346,13 +1377,16 @@ export default {
   filters: {
     /* 播放时长 */
     currentTimefiller(value) {
-      let playingtimes = (value / 60).toFixed(2);
-      return playingtimes;
+      let minutes = Math.floor(value / 60); // 获取分钟数
+      let seconds = Math.floor(value % 60); // 获取剩余的秒数
+      return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`; // 格式化为分:秒
     },
+
     /* 获取总时长 */
     durationTimefiller(value) {
-      let playingtimes = (value / 60).toFixed(2);
-      return playingtimes;
+      let minutes = Math.floor(value / 60); // 获取分钟数
+      let seconds = Math.floor(value % 60); // 获取剩余的秒数
+      return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`; // 格式化为分:秒
     },
   },
   //生命周期 - 创建完成(可以访问当前this实例)
@@ -1468,7 +1502,7 @@ export default {
   top: 0;
   //left: 0;
   min-width: 375px;
-    max-width: 750px;
+  max-width: 750px;
   width: 100%;
   height: 100%;
   background-color: black;
@@ -1531,6 +1565,7 @@ export default {
       height: 70%;
       text-align: center;
       position: relative;
+
       .stylus {
         width: 105px;
         height: 188px;
@@ -1601,6 +1636,7 @@ export default {
         height: 100%;
         position: relative;
         overflow: hidden;
+        transition: all 1s;
         ul {
           width: 100%;
           transition: all 0.2s linear;
@@ -1624,9 +1660,10 @@ export default {
     .bottomButtons {
       margin-top: 28px;
       .behindRange {
-        width: 220px;
+        width: 140px;
         height: 30px;
         margin: 0 auto;
+        padding: 0 30px;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -1692,7 +1729,7 @@ export default {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        
+
         .left {
           display: flex;
           .goback {
@@ -1780,7 +1817,7 @@ export default {
         overflow: auto;
         ul {
           width: 100%;
-          height: 555px;
+          height: 565px;
           overflow: auto;
           li {
             margin-top: 11px;
@@ -1888,9 +1925,11 @@ export default {
     /* 评论区发表内容 */
     .sendComment {
       width: 100%;
+      min-width: 375px;
+      max-width: 750px;
       height: 43px;
+      box-shadow: 0px -11px 15px -5px rgba(0, 0, 0, 0.3);
       position: fixed;
-      left: 0;
       bottom: 0;
       display: flex;
       justify-content: space-between;

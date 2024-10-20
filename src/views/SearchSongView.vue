@@ -98,8 +98,8 @@
       <!-- 未搜索视图 -->
       <div class="unSearched" v-show="unShowSearchView">
         <!-- 顶部 -->
-        <div class="top">
-          <div class="singer">
+        <div class="top" >
+          <div class="singer" @click="unFinish">
             <span>
               <svg
                 t="1657698249240"
@@ -121,7 +121,7 @@
             <span>歌手</span>
           </div>
           |
-          <div class="musicStyle">
+          <div class="musicStyle" @click="unFinish">
             <span>
               <svg
                 t="1657698413867"
@@ -143,7 +143,7 @@
             <span>曲风</span>
           </div>
           |
-          <div class="prefecture">
+          <div class="prefecture" @click="unFinish">
             <span>
               <svg
                 t="1657698459612"
@@ -165,7 +165,7 @@
             <span>专区</span>
           </div>
           |
-          <div class="findSong">
+          <div class="findSong" @click="unFinish">
             <span>
               <svg
                 t="1657698512456"
@@ -491,6 +491,7 @@
               播放
             </div>
           </div>
+          <van-loading v-if="!result"/>
           <div class="list">
             <ul>
               <li
@@ -519,16 +520,17 @@
                   <span
                     v-show="item.sq != null"
                     style="
-                      width: 12px;
+                      width: 14px;
                       height: 7px;
+                      padding:0 2px;
                       color: rgb(255, 96, 96);
                       font-size: 10px;
                       border: 1px solid rgb(255, 96, 96);
                       border-radius: 2px;
                       margin-right: 3px;
+                      text-align: center;
                     "
-                    >SQ
-                    </span>
+                    >SQ</span>
                   <span
                     class="artists"
                     v-for="(artists, index) in item.ar"
@@ -552,7 +554,7 @@
                     >
                   </div>
                 </div>
-                <div class="more">
+                <div class="more" v-show="false">
                   <svg
                     t="1657247613469"
                     class="icon"
@@ -581,8 +583,8 @@
 </template>
 
 <script>
-import { Toast } from 'vant';
-import bottomnav from '../components/basce/BottomNav.vue'
+import { Toast } from "vant";
+import bottomnav from "../components/basce/BottomNav.vue";
 //这里可以导入其他文件(比如:组件,工具js,第三方插件js,json文件,图片文件等等)
 //例如:import 《组件名称》 from '《组件路径》';
 import {
@@ -594,7 +596,7 @@ import {
 import { getTopList } from "../api/toplist";
 export default {
   //import引入的组件需要注入到对象中才能使用
-  components: {bottomnav},
+  components: { bottomnav },
   data() {
     //这里存放数据
     return {
@@ -614,9 +616,10 @@ export default {
         },
         {
           name: "恋音と雨空",
-        },{
-          name:'雅俗共赏',
-        }
+        },
+        {
+          name: "雅俗共赏",
+        },
       ],
     };
   },
@@ -677,20 +680,19 @@ export default {
     /* 搜索方法 */
     searchFun() {
       if (this.keywords == "" || this.keywords == null) {
-        Toast('请输入文字')
-        return
+        Toast("请输入文字");
+        return;
       } else {
         this.keywords;
         this.showSearchView = false;
         this.unShowSearchView = false;
-        this.historySearch.push({name:this.keywords})
+        this.historySearch.push({ name: this.keywords });
         /* 获取搜索结果方法 */
         getSearchResult({
           keywords: this.keywords,
         }).then((data) => {
           this.result = data.result.songs;
           console.log(this.result, "搜索结果");
-         
         });
       }
     },
@@ -715,14 +717,14 @@ export default {
     getTopicHotFun() {
       getTopicHot().then((data) => {
         this.topicHot = data.hot;
-        console.log('热门话题data:',this.topicHot);
+        console.log("热门话题data:", this.topicHot);
       });
     },
     /* 获取所有榜单方法 */
     getTopListFun() {
       getTopList().then((data) => {
         this.topList = data;
-        console.log('榜单data',this.topList);
+        console.log("榜单data", this.topList);
       });
     },
     playAll() {
@@ -739,6 +741,10 @@ export default {
         this.searchFun();
       }
     },
+    /* 未完成方法 */
+    unFinish(){
+      Toast("该功能维护中，请稍后再试")
+    }
   },
   //生命周期 - 创建完成(可以访问当前this实例)
   created() {
@@ -760,8 +766,10 @@ export default {
 <style lang="scss" scoped>
 .Search {
   background-color: rgb(247, 247, 247);
-  padding: 13px;
+  //padding: 13px;
   .bigTop {
+    padding: 0 13px;
+    box-sizing: border-box;
     .top {
       display: flex;
       justify-content: space-between;
@@ -794,6 +802,8 @@ export default {
     }
   }
   .searchView {
+    padding: 0 13px;
+    box-sizing: border-box;
     height: 100vh;
     ul {
       li {
@@ -816,6 +826,8 @@ export default {
     }
   }
   .unSearched {
+    padding: 0 13px;
+    box-sizing: border-box;
     color: black;
     .top {
       display: flex;
