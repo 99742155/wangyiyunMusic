@@ -7,7 +7,7 @@ Vue.use(VueRouter)
 
 const routes = [{
     path: '/',
-    redirect: '/advertisement'
+    redirect: '/home'
   },
   /* 主页 */
   {

@@ -250,7 +250,7 @@
             {{ item.ar[0].name }}
           </p>
         </div>
-        <div class="icons">
+        <!-- <div class="icons">
           <span class="iconfont">
             <svg
               t="1657247613469"
@@ -269,7 +269,7 @@
               ></path>
             </svg>
           </span>
-        </div>
+        </div> -->
       </li>
     </ul>
     <bottomnav></bottomnav>

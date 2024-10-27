@@ -696,6 +696,7 @@ export default {
 
 .home {
   //padding: 0 0.6rem;
+  font-family: "Alternate";
   padding-bottom: 100px;
   margin: 0 auto;
   background-image: linear-gradient(#e8ecec 40%, #ffffff 60%);

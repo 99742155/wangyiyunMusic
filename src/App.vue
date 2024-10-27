@@ -1,9 +1,8 @@
 <template>
   <div id="app">
-    <!-- <nav>
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </nav> -->
+    <!-- 广告页 -->
+    <advertisement-com></advertisement-com>
+
     <router-view
       @get-player-id="getPlayerId"
       @get-play-all-id="getPlayAllId"
@@ -19,16 +18,16 @@
       @get-player-id="getPlayerId"
     >
     </miniplayer>
-    
   </div>
 </template>
 
 <script>
 import miniplayer from "./components/basce/MiniPlayer.vue";
+import AdvertisementCom from "./components/public/AdvertisementCom.vue";
 export default {
   props: [],
   //import引入的组件需要注入到对象中才能使用
-  components: { miniplayer },
+  components: { miniplayer, AdvertisementCom },
   data() {
     //这里存放数据
     return {
@@ -70,6 +69,9 @@ export default {
 </script>
 
 <style lang="scss">
+#app {
+  font-family: "Alternate";
+}
 /* 初始化样式 */
 .van-sticky van-sticky--fixed {
   min-width: 375px;

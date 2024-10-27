@@ -774,7 +774,7 @@
     </div>
     <!-- 迷你歌单 -->
     <van-action-sheet v-model="show" @select="onSelect2">
-      <h3>当前播放</h3>
+      <h3 style="top: 0; position: relative">当前播放</h3>
       <div class="top">
         <div class="playModel">
           <span>
@@ -1060,12 +1060,18 @@ export default {
   methods: {
     /* 获取歌曲详情数据方法 */
     getsongDetailFun() {
+      Toast.loading({
+        duration: 0,
+        forbidClick: true,
+        message: "歌曲加载中",
+      });
       getsongDetail({ ids: this.playerId }).then((data) => {
         this.SongDetail = data.songs[0];
         console.log("songDetail", this.SongDetail);
         this.SongbgImg = this.SongDetail.al.picUrl;
         this.description =
           this.SongDetail.name + "-" + this.SongDetail.ar[0].name;
+        Toast.clear();
       });
     },
     /* 获取歌曲地址方法 */
@@ -1086,7 +1092,6 @@ export default {
     },
     /* 播放方法 */
     playing() {
-      Toast("歌曲加载中♪...");
       if (this.isplaying) {
         this.$refs.audio.play();
       } else {
@@ -1718,11 +1723,12 @@ export default {
   .commentView {
     width: 100%;
     height: 100%;
-    padding: 33px 12px;
+    padding: 33px 0px;
     box-sizing: border-box;
     background-color: white;
     z-index: 801;
     .title {
+      margin: 0 12px;
       height: 100px;
       background-color: white;
       .nav {
@@ -1789,6 +1795,7 @@ export default {
     }
     /* 评论区内容 */
     .content {
+      margin: 0 12px;
       margin-top: 22px;
       .nav {
         height: 40px;

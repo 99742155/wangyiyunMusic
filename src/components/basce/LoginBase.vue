@@ -166,6 +166,7 @@ export default {
     },
     // 提交数据
     submit() {
+      Toast("登录中请稍后...");
       // 1.验证验证码
       getCaptchaVerify({
         phone: this.phone,
